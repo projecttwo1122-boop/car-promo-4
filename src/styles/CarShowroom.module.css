@@ -1,0 +1,404 @@
+.section {
+  position: relative;
+  background: rgba(0, 0, 0, 0.16); /* Больше видно дорогу под контентом */
+  backdrop-filter: blur(0.5px); /* Легкое размытие для глубины */
+  padding: 6rem 0;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 10; /* Выше дороги */
+}
+
+/* ========== TRANSITION LINES - эффект дороги ========== */
+.transitionLines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+}
+
+.transitionLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+}
+
+/* ========== CONTAINER ========== */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ========== HEADER ========== */
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem 0;
+  color: #fff;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 2rem 0;
+  letter-spacing: 0.05em;
+}
+
+.divider {
+  width: 80px;
+  height: 1px;
+  background: var(--gold);
+  margin: 0 auto;
+  opacity: 0.8;
+}
+
+/* ========== GRID ========== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+  margin-bottom: 4rem;
+}
+
+/* ========== CARD ========== */
+.card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+}
+
+/* ========== IMAGE CONTAINER ========== */
+.imageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.card:hover .image {
+  transform: scale(1.05);
+}
+
+.yearBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+
+/* ========== CONTENT ========== */
+.content {
+  padding: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.brandSection {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.brand {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.dot {
+  width: 3px;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* ========== SPECS ========== */
+.specs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+  padding: 1.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.specItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.specLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.specValue {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: -0.01em;
+}
+
+/* ========== FOOTER ========== */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.button {
+  flex: 1;
+  padding: 0.75rem 1.25rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(212, 175, 55, 0.2);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.button:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.button:hover::before {
+  left: 100%;
+}
+
+.arrow {
+  transition: transform 0.3s ease;
+}
+
+.button:hover .arrow {
+  transform: translateX(2px);
+}
+
+/* ========== DETAILS LINE ========== */
+.detailsLine {
+  margin-top: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.detailsText {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ========== HOVER GLOW ========== */
+.hoverGlow {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, var(--gold), transparent);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+/* ========== CTA SECTION ========== */
+.cta {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(212, 175, 55, 0.05));
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  margin-top: 4rem;
+}
+
+.ctaText {
+  font-size: 1.25rem;
+  color: #fff;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.ctaButton {
+  padding: 1rem 2.5rem;
+  background: rgba(212, 175, 55, 0.1);
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ctaButton:hover {
+  background: var(--gold);
+  color: #000;
+  transform: translateY(-2px);
+}
+
+/* ========== MOBILE ========== */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+  
+  .section {
+    padding: 4rem 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .section {
+    padding: 3rem 0;
+  }
+  
+  .container {
+    padding: 0 1rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .specs {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    padding: 1rem 0;
+  }
+  
+  .specLabel {
+    font-size: 0.65rem;
+  }
+  
+  .specValue {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 2rem 0;
+  }
+  
+  .header {
+    margin-bottom: 2rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  .content {
+    padding: 1.5rem;
+  }
+  
+  .footer {
+    flex-direction: column;
+  }
+  
+  .button {
+    width: 100%;
+  }
+  
+  .ctaText {
+    font-size: 1rem;
+  }
+}

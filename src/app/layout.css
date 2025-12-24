@@ -1,0 +1,517 @@
+/* Next.js font optimization */
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'rlig' 1, 'calt' 1;
+}
+
+/* Prevents font flash */
+@font-face {
+  font-family: -apple-system;
+  src: local(-apple-system);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  color: #ffffff;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ========== AMERICAN HIGHWAY (CSS render, no photo) ========== */
+
+.app-content {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+  Road scene is ONE fixed layer behind the app.
+  - Road surface is a trapezoid (perspective)
+  - Asphalt texture is built from gradients (no images)
+  - Double yellow separator runs through the whole site
+*/
+.road-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  isolation: isolate; /* keep blend effects inside the background layer */
+  overflow: hidden;
+
+  /* Unified road geometry (easy to tune realism) */
+  --road-inset: -8vh -8vw;
+  --road-clip: polygon(46% 0%, 54% 0%, 95% 100%, 5% 100%);
+  --road-xform: perspective(980px) rotateX(24deg);
+
+  /* Back to pure highway scene (no sky/desert) */
+  background:
+    /* Subtle ground texture outside the road (kills "flat black" look) */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='520'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.12  0 0 0 0 0.12  0 0 0 0 0.12  0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
+    radial-gradient(140% 80% at 50% 0%, rgba(255, 255, 255, 0.06) 0%, transparent 55%),
+    radial-gradient(120% 90% at 50% 110%, rgba(0, 0, 0, 0.75) 0%, transparent 60%),
+    radial-gradient(90% 130% at 0% 60%, rgba(0, 0, 0, 0.6) 0%, transparent 60%),
+    radial-gradient(90% 130% at 100% 60%, rgba(0, 0, 0, 0.6) 0%, transparent 60%),
+    linear-gradient(180deg, #050505 0%, #000 55%, #050505 100%);
+
+  background-size: 520px 520px, auto, auto, auto, auto, auto;
+  background-blend-mode: soft-light, normal, normal, normal, normal, normal;
+}
+
+/* Dev-only: helps confirm the browser is showing the latest CSS/JS */
+.road-debug-badge {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 9999;
+  pointer-events: none;
+  font: 600 12px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 6px 10px;
+  backdrop-filter: blur(6px);
+}
+
+/* ===================== PHOTO REALISM LAYERS ===================== */
+
+.road-reflections,
+.road-ground,
+.road-castshadows,
+.road-atmosphere,
+.road-filmgrain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Roadside ground plane (fills side space with "terrain") */
+.road-ground {
+  z-index: -1;
+  inset: var(--road-inset);
+  clip-path: polygon(22% 0%, 78% 0%, 100% 100%, 0% 100%);
+  transform: var(--road-xform);
+  transform-origin: center top;
+
+  background:
+    radial-gradient(140% 80% at 50% 10%, rgba(255, 255, 255, 0.06) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(18, 14, 10, 0.75) 0%, rgba(10, 8, 6, 0.85) 55%, rgba(0, 0, 0, 0.96) 100%),
+    url('/textures/asphalt.jpg');
+
+  background-size: auto, auto, 1600px 1600px;
+  background-position: center, center, 0 0;
+  background-blend-mode: soft-light, multiply, normal;
+
+  /* Turn asphalt into "dark gravel/sand" */
+  filter: saturate(0.55) hue-rotate(18deg) brightness(0.52) contrast(1.15) blur(0.35px);
+  opacity: 0.92;
+}
+
+/* Big soft shadows / light patches on the asphalt (adds depth) */
+.road-castshadows {
+  z-index: 1;
+  inset: var(--road-inset);
+  clip-path: var(--road-clip);
+  transform: var(--road-xform);
+  transform-origin: center top;
+
+  background:
+    /* very low-frequency shadow map */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.06' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E"),
+    /* extra diagonal soft bands (like uneven lighting) */
+    linear-gradient(112deg, rgba(0, 0, 0, 0.30) 0%, transparent 34%, rgba(0, 0, 0, 0.18) 62%, transparent 100%);
+
+  background-size: 1800px 1800px, auto;
+  background-blend-mode: multiply, normal;
+
+  mix-blend-mode: multiply;
+  opacity: 0.42;
+  filter: blur(14px);
+
+  /* Stronger near bottom, faint near horizon */
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.75) 32%, rgba(0,0,0,1) 68%, rgba(0,0,0,1) 100%);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.75) 32%, rgba(0,0,0,1) 68%, rgba(0,0,0,1) 100%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .road-castshadows {
+    animation: roadShadowDrift 56s linear infinite;
+  }
+}
+
+@keyframes roadShadowDrift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 520px -340px, 0 0;
+  }
+}
+
+/* Wet/specular reflections on asphalt (under markings) */
+.road-reflections {
+  z-index: 2;
+  inset: var(--road-inset);
+  clip-path: var(--road-clip);
+  transform: var(--road-xform);
+  transform-origin: center top;
+
+  background:
+    /* soft reflection pool near the camera */
+    radial-gradient(ellipse 55% 70% at 50% 92%, rgba(255, 255, 255, 0.06) 0%, transparent 60%),
+    /* reflected double yellow glow (wider than the paint) */
+    linear-gradient(
+      90deg,
+      transparent calc(50% - 34px),
+      rgba(242, 164, 0, 0.12) calc(50% - 34px) calc(50% - 7px),
+      transparent calc(50% - 7px) calc(50% + 7px),
+      rgba(242, 164, 0, 0.12) calc(50% + 7px) calc(50% + 34px),
+      transparent calc(50% + 34px)
+    ),
+    /* subtle side sheen */
+    linear-gradient(
+      90deg,
+      transparent 6%,
+      rgba(255, 255, 255, 0.05) 7% 10%,
+      transparent 12% 88%,
+      rgba(255, 255, 255, 0.05) 90% 93%,
+      transparent 94%
+    );
+
+  /* Stronger near bottom, almost none towards horizon */
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.35) 30%, rgba(0,0,0,1) 78%, rgba(0,0,0,1) 100%);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.35) 30%, rgba(0,0,0,1) 78%, rgba(0,0,0,1) 100%);
+
+  mix-blend-mode: screen;
+  filter: blur(10px) saturate(1.05);
+  opacity: 0.85;
+}
+
+/* Atmosphere / depth-of-field: blur + haze mostly at the horizon */
+.road-atmosphere {
+  z-index: 4;
+
+  background:
+    radial-gradient(120% 70% at 50% 0%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 34%, transparent 72%),
+    radial-gradient(120% 90% at 50% 100%, transparent 0%, rgba(0, 0, 0, 0.35) 70%, rgba(0, 0, 0, 0.65) 100%);
+
+  /* Apply to top ~55% only */
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 18%, rgba(0,0,0,0.35) 42%, rgba(0,0,0,0) 64%);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 18%, rgba(0,0,0,0.35) 42%, rgba(0,0,0,0) 64%);
+
+  /* Realistic "camera" feel */
+  opacity: 0.9;
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .road-atmosphere {
+    -webkit-backdrop-filter: blur(2px) saturate(0.92) contrast(0.92);
+    backdrop-filter: blur(2px) saturate(0.92) contrast(0.92);
+  }
+}
+
+/* Film grain + vignette (above everything) */
+.road-filmgrain {
+  z-index: 5;
+  opacity: 0.26;
+  mix-blend-mode: soft-light;
+
+  background:
+    radial-gradient(120% 110% at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.55) 72%, rgba(0, 0, 0, 0.85) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+
+  background-size: auto, 420px 420px;
+  background-blend-mode: multiply, overlay;
+}
+
+/* Road surface (asphalt) */
+.road-scene::before {
+  content: '';
+  position: absolute;
+  inset: var(--road-inset); /* allow perspective/clip without edges */
+  z-index: 0;
+
+  /* Perspective trapezoid: narrow at horizon, wide at bottom */
+  clip-path: var(--road-clip);
+
+  /* Asphalt texture: multiple granular layers + subtle cracks */
+  background:
+    /* Procedural noise (SVG turbulence) - no images */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.22  0 0 0 0 0.22  0 0 0 0 0.22  0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    /* Macro mottling (bigger repaired/aged spots) */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='760' height='760'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.22' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.22  0 0 0 0 0.22  0 0 0 0 0.22  0 0 0 .28 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E"),
+    /* Asphalt tonal base (a bit lighter, like real road) */
+    linear-gradient(
+      180deg,
+      rgba(43, 43, 43, 0.78) 0%,
+      rgba(36, 36, 36, 0.82) 18%,
+      rgba(27, 27, 27, 0.86) 60%,
+      rgba(17, 17, 17, 0.90) 100%
+    ),
+    /* Side feathering (soft falloff so trapezoid edges don't look "CG") */
+    linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, transparent 16%, transparent 84%, rgba(0, 0, 0, 0.55) 100%),
+    /* Shoulder / gravel hint near edges */
+    linear-gradient(
+      90deg,
+      rgba(170, 170, 170, 0.10) 0%,
+      transparent 14%,
+      transparent 86%,
+      rgba(170, 170, 170, 0.10) 100%
+    ),
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.055) 0%, transparent 42%),
+    radial-gradient(circle at 78% 22%, rgba(255, 255, 255, 0.045) 0%, transparent 38%),
+    radial-gradient(circle at 46% 16%, rgba(255, 255, 255, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 28% 72%, rgba(255, 255, 255, 0.03) 0%, transparent 38%),
+    radial-gradient(circle at 74% 68%, rgba(255, 255, 255, 0.03) 0%, transparent 40%),
+    /* Tire marks (subtle, long) */
+    radial-gradient(ellipse 20% 55% at 44% 70%, rgba(0, 0, 0, 0.28) 0%, transparent 62%),
+    radial-gradient(ellipse 20% 55% at 56% 72%, rgba(0, 0, 0, 0.26) 0%, transparent 62%),
+    radial-gradient(ellipse 16% 45% at 47% 35%, rgba(0, 0, 0, 0.18) 0%, transparent 66%),
+    radial-gradient(ellipse 16% 45% at 53% 38%, rgba(0, 0, 0, 0.16) 0%, transparent 66%),
+    /* Patchwork / repaired asphalt */
+    radial-gradient(ellipse 28% 18% at 30% 78%, rgba(255, 255, 255, 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 24% 16% at 68% 64%, rgba(0,  0,  0,  0.24) 0%, transparent 70%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.01) 0 1px, transparent 1px 5px),
+    /* Tar seams / crack-like diagonals */
+    linear-gradient(45deg, transparent 0 41%, rgba(0, 0, 0, 0.24) 41% 41.6%, transparent 41.6% 100%),
+    linear-gradient(-38deg, transparent 0 58%, rgba(0, 0, 0, 0.22) 58% 58.6%, transparent 58.6% 100%),
+    /* Longitudinal crack */
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 49.2%,
+      rgba(0, 0, 0, 0.18) 49.2%,
+      rgba(0, 0, 0, 0.18) 49.35%,
+      transparent 49.35%,
+      transparent 100%
+    ),
+    /* Random micro-cracks (thin) */
+    linear-gradient(12deg, transparent 0 54%, rgba(0, 0, 0, 0.22) 54% 54.2%, transparent 54.2% 100%),
+    linear-gradient(-9deg, transparent 0 33%, rgba(0, 0, 0, 0.2) 33% 33.15%, transparent 33.15% 100%),
+    linear-gradient(24deg, transparent 0 68%, rgba(0, 0, 0, 0.18) 68% 68.18%, transparent 68.18% 100%),
+    /* depth shading (darker near bottom, lighter near horizon) */
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 16%, rgba(0, 0, 0, 0.18) 62%, rgba(0, 0, 0, 0.55) 100%),
+    /* Slight center brightening (lane crown) */
+    radial-gradient(ellipse 60% 120% at 50% 85%, rgba(255, 255, 255, 0.03) 0%, transparent 55%),
+    /* Visible crack-map like real asphalt (SVG, no photo) */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900' viewBox='0 0 900 900'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='0.9'/%3E%3C/filter%3E%3Cg filter='url(%23b)' fill='none' stroke-linecap='round'%3E%3Cpath d='M110,860C210,740,250,640,320,560C400,470,440,380,520,300C610,215,700,160,835,120' stroke='%23000' stroke-opacity='.32' stroke-width='7'/%3E%3Cpath d='M260,890C290,780,340,700,380,620C420,540,460,500,520,460C590,410,650,350,720,260' stroke='%23000' stroke-opacity='.26' stroke-width='5'/%3E%3Cpath d='M60,700C150,660,240,640,330,610C430,575,520,560,610,520C710,475,800,430,880,380' stroke='%23000' stroke-opacity='.22' stroke-width='4'/%3E%3Cpath d='M420,900C430,820,450,760,470,710C495,645,520,610,550,570C590,520,620,460,650,390' stroke='%23000' stroke-opacity='.24' stroke-width='4'/%3E%3Cpath d='M150,620C210,570,250,520,300,470C350,420,390,380,430,330C470,280,520,230,590,180' stroke='%23000' stroke-opacity='.2' stroke-width='3'/%3E%3Cpath d='M520,620C560,610,590,595,620,575C650,555,685,535,720,520' stroke='%23000' stroke-opacity='.22' stroke-width='3'/%3E%3Cpath d='M320,560C345,555,370,540,395,520C420,500,450,485,480,470' stroke='%23000' stroke-opacity='.2' stroke-width='3'/%3E%3Cpath d='M610,520C640,515,665,505,690,490C715,475,745,465,780,455' stroke='%23000' stroke-opacity='.18' stroke-width='3'/%3E%3C/g%3E%3C/svg%3E"),
+    /* Real photo base texture (CC0, Poly Haven) */
+    url('/textures/asphalt.jpg');
+
+  background-size:
+    320px 320px,
+    760px 760px,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    900px 900px,
+    1100px 1100px;
+
+  background-blend-mode:
+    overlay,
+    multiply,
+    normal,
+    normal,
+    soft-light,
+    normal,
+    normal,
+    normal,
+    normal,
+    normal,
+    multiply,
+    multiply,
+    multiply,
+    multiply,
+    overlay,
+    soft-light,
+    overlay,
+    overlay,
+    multiply,
+    multiply,
+    normal,
+    normal,
+    multiply,
+    normal;
+
+  /* subtle perspective, not "3D triangle" */
+  transform: var(--road-xform);
+  transform-origin: center top;
+  /*
+    Tiny blur is intentional: it removes the "procedural / too sharp" look
+    and makes the asphalt read like a photographed surface.
+  */
+  filter: contrast(1.20) saturate(0.84) brightness(1.08) blur(0.06px);
+  opacity: 0.98;
+
+  /* Make far distance slightly hazier (more photographic) */
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.92) 24%, rgba(0,0,0,1) 55%, rgba(0,0,0,1) 100%);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.92) 24%, rgba(0,0,0,1) 55%, rgba(0,0,0,1) 100%);
+}
+
+/* Road markings + subtle light reflections */
+.road-scene::after {
+  content: '';
+  position: absolute;
+  inset: var(--road-inset);
+  clip-path: var(--road-clip);
+  z-index: 3;
+
+  /* Markings: side whites + DOUBLE yellow in the center */
+  background:
+    /* Grunge/noise on paint */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='380'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    /* Soft headlight-like sheen */
+    radial-gradient(ellipse at 50% 18%, rgba(255, 255, 255, 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 70%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
+
+    /* Edge white lines */
+    linear-gradient(
+      90deg,
+      transparent 6%,
+      rgba(255, 255, 255, 0.92) 6% 6.75%,
+      transparent 6.7% 93.3%,
+      rgba(255, 255, 255, 0.92) 93.25% 94%,
+      transparent 94%
+    ),
+
+    /* Double yellow separator (solid like reference) */
+    linear-gradient(
+      90deg,
+      transparent calc(50% - 9px),
+      #f2a400 calc(50% - 9px) calc(50% - 5px),
+      transparent calc(50% - 5px) calc(50% + 5px),
+      #f2a400 calc(50% + 5px) calc(50% + 9px),
+      transparent calc(50% + 9px)
+    ),
+    /* Yellow paint shading (adds thickness / roller texture) */
+    linear-gradient(
+      90deg,
+      transparent calc(50% - 9px),
+      rgba(255, 255, 220, 0.22) calc(50% - 9px) calc(50% - 7.5px),
+      transparent calc(50% - 7.5px) calc(50% - 5px),
+      transparent calc(50% + 5px) calc(50% + 7.5px),
+      rgba(255, 255, 220, 0.22) calc(50% + 7.5px) calc(50% + 9px),
+      transparent calc(50% + 9px)
+    ),
+    /* Tiny wear/noise on paint */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.0) 0 22px,
+      rgba(0, 0, 0, 0.14) 22px 24px,
+      rgba(0, 0, 0, 0.0) 24px 64px
+    );
+
+  background-size:
+    260px 260px,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto;
+
+  background-blend-mode:
+    multiply,
+    normal,
+    normal,
+    normal,
+    normal,
+    screen,
+    multiply;
+
+  transform: var(--road-xform);
+  transform-origin: center top;
+  mix-blend-mode: normal;
+  opacity: 0.96;
+  filter:
+    drop-shadow(0 3px 10px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 16px rgba(242, 164, 0, 0.22));
+
+  /*
+    Markings should fade towards the horizon (atmosphere / distance),
+    otherwise the scene looks "flat & CG".
+  */
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 12%, rgba(0,0,0,0.85) 34%, rgba(0,0,0,1) 54%, rgba(0,0,0,1) 100%);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 12%, rgba(0,0,0,0.85) 34%, rgba(0,0,0,1) 54%, rgba(0,0,0,1) 100%);
+}
+
+@media (max-width: 900px) {
+  .road-scene {
+    --road-inset: -10vh -10vw;
+    --road-clip: polygon(38% 0%, 62% 0%, 98% 100%, 2% 100%);
+    --road-xform: perspective(820px) rotateX(26deg);
+  }
+}
+
+#__next {
+  width: 100%;
+}
+
+/* Performance optimizations */
+* {
+  box-sizing: border-box;
+}
+
+button,
+a {
+  text-decoration: none;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+input,
+textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  body {
+    --muted-text: #999999;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

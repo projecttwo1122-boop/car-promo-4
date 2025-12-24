@@ -1,0 +1,236 @@
+.footer {
+  background: rgba(0, 0, 0, 0.22); /* Больше видно дорогу под футером */
+  backdrop-filter: blur(0.5px); /* Легкое размытие */
+  color: #fff;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  position: relative;
+  z-index: 10; /* Выше дороги */
+}
+
+.topDivider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.5;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+.social {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.socialLink {
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.socialLink::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--gold);
+  transition: width 0.3s ease;
+}
+
+.socialLink:hover {
+  color: var(--gold);
+}
+
+.socialLink:hover::after {
+  width: 100%;
+}
+
+.columnTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 1rem 0;
+  color: var(--gold);
+}
+
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.links li a {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.3s ease;
+  position: relative;
+  padding-left: 0.5rem;
+}
+
+.links li a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.links li a:hover {
+  color: var(--gold);
+  padding-left: 1rem;
+}
+
+.links li a:hover::before {
+  opacity: 1;
+}
+
+.contactLinks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contactLinks li a {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.contactLinks li a:hover {
+  color: var(--gold);
+}
+
+.hours {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.6;
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.copyright {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+}
+
+.legal {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 2rem;
+}
+
+.legal li a {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.legal li a:hover {
+  color: var(--gold);
+}
+
+.bottomDivider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+}
+
+/* Мобильная адаптивность */
+@media (max-width: 768px) {
+  .container {
+    padding: 2rem 1rem;
+  }
+  
+  .content {
+    gap: 2rem;
+  }
+  
+  .bottom {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .legal {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+  
+  .content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .title {
+    font-size: 1rem;
+  }
+  
+  .columnTitle {
+    font-size: 0.75rem;
+  }
+  
+  .social {
+    gap: 1rem;
+  }
+}

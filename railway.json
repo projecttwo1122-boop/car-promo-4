@@ -1,0 +1,14 @@
+# Deployment configuration for Railway
+[build]
+builder = "nixpacks"
+
+[start]
+cmd = "npm start"
+
+[[services]]
+name = "promo-4"
+domain = "premium-auto-4.railway.app"
+plan = "starter"
+
+
+

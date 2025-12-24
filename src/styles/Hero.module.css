@@ -1,0 +1,254 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* Прозрачный фон, чтобы дорога была видна */
+  background: transparent;
+  overflow: hidden;
+  margin-top: 60px;
+  z-index: 10; /* Выше дороги */
+}
+
+/* Эффект движения дороги - частицы пыли */
+.roadMotion {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.roadParticles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,215,0,0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255,215,0,0.05) 0%, transparent 40%),
+    radial-gradient(circle at 40% 80%, rgba(255,215,0,0.08) 0%, transparent 45%);
+  animation: particlesFloat 15s ease-in-out infinite;
+}
+
+@keyframes particlesFloat {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateY(-20px) scale(1.1);
+  }
+}
+
+/* ========== ROAD BACKGROUND вместо roadEffect ========== */
+
+/* ========== CONTENT ========== */
+.content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 900px;
+  padding: 0 2rem;
+  margin: 0 auto;
+}
+
+.titleWrapper {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: clamp(3.5rem, 10vw, 6rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.titleLine1 {
+  display: block;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.titleLine2 {
+  display: block;
+  background: linear-gradient(90deg, var(--gold), rgba(212, 175, 55, 0.5));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.8;
+  margin: 0 0 2.5rem 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ========== BUTTONS ========== */
+.buttons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 4rem;
+}
+
+.primaryButton,
+.secondaryButton {
+  padding: 1rem 2.5rem;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.primaryButton {
+  background: #fff;
+  color: #000;
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.primaryButton:hover {
+  background: transparent;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.primaryButton:hover .arrow {
+  transform: translateY(4px);
+}
+
+.secondaryButton {
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.secondaryButton:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ========== SCROLL INDICATOR ========== */
+.scrollIndicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.scrollIndicator:hover {
+  opacity: 1;
+}
+
+.scrollDot {
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
+
+.scrollText {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ========== MOBILE ========== */
+@media (max-width: 768px) {
+  .hero {
+    margin-top: 60px;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .title {
+    font-size: 2.5rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .buttons {
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .primaryButton,
+  .secondaryButton {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .scrollIndicator {
+    bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.875rem;
+  }
+  
+  .subtitle {
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+  }
+}

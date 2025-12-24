@@ -1,0 +1,47 @@
+.container {
+  display: inline;
+}
+
+.container.highlight {
+  position: relative;
+}
+
+.container.highlight::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+  border-radius: 2px;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.primary {
+  color: var(--primary-color);
+}
+
+.accent {
+  color: var(--accent-color);
+}
+
+.success {
+  color: var(--success-color);
+}
+
+.warning {
+  color: var(--warning-color);
+}
+
+
+
