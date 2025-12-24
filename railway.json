@@ -1,14 +1,11 @@
-# Deployment configuration for Railway
-[build]
-builder = "nixpacks"
-
-[start]
-cmd = "npm start"
-
-[[services]]
-name = "promo-4"
-domain = "premium-auto-4.railway.app"
-plan = "starter"
-
-
-
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
